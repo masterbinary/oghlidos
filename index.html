@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TSP 5.0 | مسیریاب حرفه‌ای اقلیدسی</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- دکمه همبرگری -->
+    <button class="hamburger-btn" id="hamburgerBtn">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <!-- نوار بالایی دسکتاپ -->
+    <div class="top-navbar desktop-nav">
+        <div class="nav-brand">
+            <span class="brand-icon">🗺️</span>
+            <span class="brand-text">TSP 5.0 | مسیریاب هوشمند اقلیدسی</span>
+        </div>
+        <div class="nav-buttons">
+            <button id="addPointBtn" class="btn btn-primary">
+                <span class="btn-icon">➕</span> نقطه جدید
+            </button>
+            <button id="randomPointsBtn" class="btn btn-success">
+                <span class="btn-icon">🎲</span> تصادفی
+            </button>
+            <button id="clearAllBtn" class="btn btn-outline">
+                <span class="btn-icon">🗑️</span> پاکسازی
+            </button>
+            <button id="runLearningBtn" class="btn btn-warning">
+                <span class="btn-icon">🎓</span> آموزش
+            </button>
+            
+            <!-- Dropdown انتخاب الگوریتم -->
+            <div class="custom-dropdown" id="algoDropdown">
+                <button class="custom-dropdown-btn" id="algoDropdownBtn">
+                    <span class="dropdown-btn-icon">🔍</span>
+                    <span class="dropdown-btn-text">نزدیک‌ترین همسایه</span>
+                    <span class="dropdown-btn-arrow">▼</span>
+                </button>
+                <div class="custom-dropdown-menu" id="algoDropdownMenu">
+                    <div class="dropdown-menu-header">
+                        <span>🧠</span> انتخاب الگوریتم
+                    </div>
+                    <div class="dropdown-menu-item active" data-algo="nearest" data-icon="🔍" data-name="نزدیک‌ترین همسایه">
+                        <span class="item-icon">🔍</span>
+                        <div class="item-info">
+                            <span class="item-title">نزدیک‌ترین همسایه</span>
+                            <span class="item-desc">سریع‌ترین الگوریتم، مناسب برای یادگیری</span>
+                        </div>
+                        <span class="item-check">✓</span>
+                    </div>
+                    <div class="dropdown-menu-item" data-algo="twoopt" data-icon="⚙️" data-name="بهینه‌سازی 2-OPT">
+                        <span class="item-icon">⚙️</span>
+                        <div class="item-info">
+                            <span class="item-title">بهینه‌سازی 2-OPT</span>
+                            <span class="item-desc">بهبود مسیرهای اولیه با کیفیت خوب</span>
+                        </div>
+                        <span class="item-check">✓</span>
+                    </div>
+                    <div class="dropdown-menu-item" data-algo="genetic" data-icon="🧬" data-name="الگوریتم ژنتیک">
+                        <span class="item-icon">🧬</span>
+                        <div class="item-info">
+                            <span class="item-title">الگوریتم ژنتیک</span>
+                            <span class="item-desc">کیفیت بالا، مناسب برای نقاط زیاد</span>
+                        </div>
+                        <span class="item-check">✓</span>
+                    </div>
+                    <div class="dropdown-menu-item" data-algo="hybrid" data-icon="🔥" data-name="هیبرید (NN+2OPT)">
+                        <span class="item-icon">🔥</span>
+                        <div class="item-info">
+                            <span class="item-title">هیبرید (NN+2OPT)</span>
+                            <span class="item-desc">توصیه شده - تعادل سرعت و کیفیت</span>
+                        </div>
+                        <span class="item-check">✓</span>
+                    </div>
+                </div>
+            </div>
+            
+            <select id="algoSelectLearn" style="display: none;">
+                <option value="nearest">نزدیک‌ترین همسایه</option>
+                <option value="twoopt">بهینه‌سازی 2-OPT</option>
+                <option value="genetic">الگوریتم ژنتیک</option>
+                <option value="hybrid">هیبرید</option>
+            </select>
+            
+            <button class="btn btn-outline" id="aboutBtn">
+                <span class="btn-icon">ℹ️</span> درباره
+            </button>
+        </div>
+    </div>
+
+    <!-- منوی موبایل -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <span class="mobile-menu-title">🗺️ TSP 5.0</span>
+            <button class="close-menu-btn" id="closeMenuBtn">✕</button>
+        </div>
+        <div class="mobile-menu-content">
+            <button id="mobileAddPointBtn" class="btn btn-primary mobile-btn">
+                <span class="btn-icon">➕</span> نقطه جدید
+            </button>
+            <button id="mobileRandomPointsBtn" class="btn btn-success mobile-btn">
+                <span class="btn-icon">🎲</span> نقاط تصادفی
+            </button>
+            <button id="mobileClearAllBtn" class="btn btn-outline mobile-btn">
+                <span class="btn-icon">🗑️</span> پاکسازی
+            </button>
+            
+            <div class="mobile-selector-section">
+                <div class="mobile-selector-title">🧠 انتخاب الگوریتم</div>
+                <div class="mobile-selector-options">
+                    <div class="mobile-selector-item active" data-algo="nearest">
+                        <span>🔍</span>
+                        <span>نزدیک‌ترین همسایه</span>
+                    </div>
+                    <div class="mobile-selector-item" data-algo="twoopt">
+                        <span>⚙️</span>
+                        <span>بهینه‌سازی 2-OPT</span>
+                    </div>
+                    <div class="mobile-selector-item" data-algo="genetic">
+                        <span>🧬</span>
+                        <span>الگوریتم ژنتیک</span>
+                    </div>
+                    <div class="mobile-selector-item" data-algo="hybrid">
+                        <span>🔥</span>
+                        <span>هیبرید</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="mobileRunLearningBtn" class="btn btn-warning mobile-btn">
+                <span class="btn-icon">🎓</span> آموزش گام به گام
+            </button>
+            <button id="mobileAboutBtn" class="btn btn-outline mobile-btn">
+                <span class="btn-icon">ℹ️</span> درباره
+            </button>
+        </div>
+    </div>
+    <div class="menu-overlay" id="menuOverlay"></div>
+
+    <!-- پنل کناری -->
+    <div class="sidebar-panel" id="sidebarPanel">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn">✕</button>
+        <div class="sidebar-content">
+            <div class="panel-header">
+                <div class="header-icon">🧠</div>
+                <h2>داشبورد TSP</h2>
+            </div>
+
+            <div class="learning-card">
+                <div class="card-header">
+                    <span class="algo-badge">الگوریتم فعال</span>
+                    <span id="currentAlgoName" class="algo-name">نزدیک‌ترین همسایه</span>
+                </div>
+                <div class="card-description">
+                    📐 کوتاه‌ترین مسیر همیلتونی با بازگشت به مبدأ
+                </div>
+                <div id="stepExplanation" class="step-explanation">
+                    🌟 روی دکمه «آموزش گام به گام» کلیک کنید...
+                </div>
+            </div>
+
+            <div class="section-title">
+                <span class="title-icon">🏆</span>
+                <h3>مقایسه الگوریتم‌ها</h3>
+            </div>
+            <div id="compareList" class="compare-list"></div>
+
+            <div class="section-title">
+                <span class="title-icon">📖</span>
+                <h3>مراحل آموزشی</h3>
+            </div>
+            <div class="step-indicator" id="stepDots"></div>
+            <button id="nextStepBtn" class="next-step-btn" disabled>
+                <span class="btn-arrow">▶</span> گام بعدی
+            </button>
+
+            <hr class="divider">
+
+            <div class="info-row">
+                <span class="info-label">📍 نقاط فعال</span>
+                <strong id="pointCount" class="info-value">0</strong>
+            </div>
+            <div class="info-row">
+                <span class="info-label">🏅 بهترین مسیر</span>
+                <span id="bestDistanceVal" class="distance-badge">0.00</span>
+            </div>
+
+            <div class="footer-hint">
+                <span>🖱️</span> کلیک چپ → افزودن نقطه &nbsp;|&nbsp; 
+                <span>🖱️</span> راست کلیک → حذف آخرین نقطه
+            </div>
+        </div>
+    </div>
+    <button class="sidebar-open-btn" id="sidebarOpenBtn">
+        <span>◀</span>
+    </button>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

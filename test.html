@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TSP 5.0 | منوی حرفه‌ای با شماره نقاط و اسکرول لوکس</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazir', 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 30% 20%, #0a0f21, #03060c);
+        }
+
+        /* ============================================
+           نوار بالایی لوکس
+        ============================================ */
+        .top-navbar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 400px;
+            background: rgba(15, 25, 45, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 8px 24px 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 30;
+            border: 1px solid rgba(255, 215, 120, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #FFE2A4, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: linear-gradient(105deg, #3b82f6, #1e40af); color: white; box-shadow: 0 2px 8px rgba(59,130,246,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.05); }
+        .btn-success { background: linear-gradient(105deg, #10b981, #047857); color: white; }
+        .btn-warning { background: linear-gradient(105deg, #f59e0b, #b45309); color: white; }
+        .btn-outline { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,215,120,0.5); color: #FFE4B5; }
+        .btn-outline:hover { background: rgba(255,215,120,0.2); border-color: #FFD966; }
+
+        select {
+            background: rgba(15, 25, 45, 0.95);
+            border: 1px solid #facc55;
+            border-radius: 40px;
+            padding: 7px 18px;
+            color: #fef3c7;
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        /* ============================================
+           پنل کناری با اسکرول زیبا و استاندارد
+        ============================================ */
+        .sidebar-panel {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            bottom: 20px;
+            width: 380px;
+            background: rgba(10, 18, 32, 0.85);
+            backdrop-filter: blur(24px);
+            border-radius: 36px;
+            border: 1px solid rgba(255, 220, 150, 0.25);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            color: #f0f3fc;
+            padding: 24px 22px;
+            overflow-y: auto;
+            z-index: 25;
+            transition: all 0.3s;
+        }
+
+        /* اسکرول بار طلایی و زیبا */
+        .sidebar-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+        .sidebar-panel::-webkit-scrollbar-track {
+            background: rgba(20, 30, 50, 0.6);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        .sidebar-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #facc55, #e5a03a);
+            border-radius: 10px;
+        }
+        .sidebar-panel::-webkit-scrollbar-thumb:hover {
+            background: #ffcf6e;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(250, 200, 100, 0.3);
+            margin-bottom: 20px;
+        }
+        .panel-header h2 { font-size: 1.35rem; font-weight: 600; background: linear-gradient(135deg, #FFE6B3, #FFC97A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+        .learning-card {
+            background: rgba(25, 35, 60, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 18px;
+            margin: 18px 0;
+            border-right: 4px solid #facc55;
+        }
+
+        .algo-badge {
+            background: #facc5522;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            border: 1px solid #facc55;
+            color: #FFE2A4;
+        }
+
+        .algo-compare-item {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 22px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255, 210, 100, 0.2);
+        }
+        .algo-compare-item:hover { background: rgba(59, 130, 246, 0.4); transform: translateX(-6px); border-color: #facc55; }
+
+        /* استپ‌های زیبا */
+        .step-indicator {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        .step-dot {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #1f2a46;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border: 1px solid rgba(250, 200, 100, 0.6);
+            color: #cddcff;
+        }
+        .step-dot.active {
+            background: radial-gradient(circle at 30% 30%, #facc55, #e09d32);
+            color: #0f1722;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #ffbf77;
+            border-color: #ffe6aa;
+        }
+
+        /* دکمه گام بعدی مدرن */
+        .next-step-btn {
+            width: 100%;
+            background: linear-gradient(105deg, #3b82f6, #1e3a8a);
+            border: none;
+            padding: 12px;
+            border-radius: 60px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.25s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.3);
+        }
+        .next-step-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            background: linear-gradient(105deg, #4f8ef7, #2563eb);
+            box-shadow: 0 8px 22px rgba(59,130,246,0.5);
+        }
+        .next-step-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 12px 18px;
+            border-radius: 28px;
+            margin: 12px 0;
+            font-weight: 500;
+        }
+        .distance-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #FFE2A4;
+            text-shadow: 0 0 6px #ffb347;
+        }
+        hr { border-color: rgba(255, 220, 150, 0.2); margin: 18px 0; }
+        .footer-hint {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 20px;
+            opacity: 0.7;
+            background: rgba(0,0,0,0.3);
+            padding: 10px;
+            border-radius: 30px;
+        }
+
+        @media (max-width: 850px) {
+            .top-navbar { right: 340px; left: 12px; padding: 6px 12px; }
+            .sidebar-panel { width: 320px; right: 12px; padding: 18px; }
+            .nav-buttons .btn { padding: 5px 12px; font-size: 0.7rem; }
+            .step-dot { width: 34px; height: 34px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-navbar">
+        <div class="nav-brand">🗺️ TSP 5.0 | مسیریاب حرفه‌ای اقلیدسی</div>
+        <div class="nav-buttons">
+            <button id="addPointBtn" class="btn btn-primary">➕ نقطه جدید</button>
+            <button id="randomPointsBtn" class="btn btn-success">🎲 تصادفی (10 نقطه)</button>
+            <button id="clearAllBtn" class="btn btn-outline">🗑️ پاکسازی</button>
+            <button id="runLearningBtn" class="btn btn-warning">🎓 آموزش گام به گام</button>
+            <select id="algoSelectLearn">
+                <option value="nearest">🔍 نزدیک‌ترین همسایه</option>
+                <option value="genetic">🧬 ژنتیک پیشرفته</option>
+                <option value="twoopt">🔄 2-OPT بهینه‌ساز</option>
+                <option value="hybrid">⚡ هیبرید (NN+2OPT)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="sidebar-panel">
+        <div class="panel-header">
+            <h2>🧠 داشبورد TSP</h2>
+        </div>
+        <div class="learning-card">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                <span class="algo-badge">الگوریتم فعال</span>
+                <span id="currentAlgoName" style="color:#facc55; font-weight: bold;">نزدیک‌ترین همسایه</span>
+            </div>
+            <div style="font-size:0.85rem;">📐 کوتاه‌ترین مسیر همیلتونی با بازگشت به مبدأ</div>
+            <div id="stepExplanation" style="margin-top: 14px; background:#03060caa; padding: 14px; border-radius: 22px; font-size:0.8rem;">
+                🌟 روی دکمه «آموزش گام به گام» کلیک کنید...
+            </div>
+        </div>
+
+        <h3 style="margin: 18px 0 10px 0;">🏆 مقایسه الگوریتم‌ها</h3>
+        <div id="compareList"></div>
+
+        <h3 style="margin: 22px 0 10px 0;">📖 مراحل آموزشی</h3>
+        <div class="step-indicator" id="stepDots"></div>
+        <button id="nextStepBtn" class="next-step-btn" disabled>
+            <span>▶</span> گام بعدی
+        </button>
+
+        <hr>
+        <div class="info-row">
+            <span>📍 نقاط فعال</span>
+            <strong id="pointCount">0</strong>
+        </div>
+        <div class="info-row">
+            <span>🏅 بهترین مسیر (مقایسه)</span>
+            <span id="bestDistanceVal" class="distance-badge">0.00</span>
+        </div>
+        <div class="footer-hint">
+            🖱️ کلیک چپ روی صحنه → افزودن نقطه &nbsp;|&nbsp; 🖱️ راست کلیک → حذف آخرین نقطه
+        </div>
+    </div>
+
+    <canvas id="bgCanvas" style="position: fixed; top:0; left:0; width:100%; height:100%; display: block; z-index: 0;"></canvas>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // ========== صحنه سه بعدی با کیفیت بالا ==========
+        const canvas = document.getElementById('bgCanvas');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070b18);
+        scene.fog = new THREE.FogExp2(0x070b18, 0.004);
+
+        const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 7, 14);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'fixed';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        labelRenderer.domElement.style.zIndex = '5';
+        document.body.appendChild(labelRenderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.target.set(0, 0.2, 0);
+
+        // نورپردازی سینمایی
+        const ambient = new THREE.AmbientLight(0x3a4a7a, 0.55);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xfff2e0, 1.1);
+        mainLight.position.set(6, 10, 5);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x6688aa, 0.5);
+        fillLight.position.set(-3, 4, 4);
+        scene.add(fillLight);
+        const rim = new THREE.PointLight(0xffaa77, 0.4);
+        rim.position.set(0, 2, -8);
+        scene.add(rim);
+
+        const gridHelper = new THREE.GridHelper(24, 28, 0x88aaff, 0x4466aa);
+        gridHelper.position.y = -0.9;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.4;
+        scene.add(gridHelper);
+
+        const groundDisc = new THREE.Mesh(
+            new THREE.CircleGeometry(11, 32),
+            new THREE.MeshStandardMaterial({ color: 0x112244, roughness: 0.5, metalness: 0.2, transparent: true, opacity: 0.25 })
+        );
+        groundDisc.rotation.x = -Math.PI/2;
+        groundDisc.position.y = -0.95;
+        scene.add(groundDisc);
+
+        const starGeo = new THREE.BufferGeometry();
+        const starPos = [];
+        for(let i=0;i<1600;i++){
+            starPos.push((Math.random()-0.5)*200);
+            starPos.push((Math.random()-0.5)*90);
+            starPos.push((Math.random()-0.5)*80-35);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPos), 3));
+        const starsMat = new THREE.PointsMaterial({ color: 0xccd6ff, size: 0.07, transparent: true, opacity: 0.6 });
+        const starsField = new THREE.Points(starGeo, starsMat);
+        scene.add(starsField);
+
+        // ========== داده‌ها و الگوریتم‌ها ==========
+        let points = [];
+        let currentPath3D = [];
+        let learningSteps = [];
+        let currentStep = 0;
+        let isLearning = false;
+
+        const pointGroup = new THREE.Group();
+        const lineGroup = new THREE.Group();
+        const labelGroup = new THREE.Group();
+        scene.add(pointGroup);
+        scene.add(lineGroup);
+        scene.add(labelGroup);
+
+        function dist(p1, p2) { return Math.hypot(p1.x - p2.x, p1.z - p2.z); }
+        function totalDistance(pathArr) {
+            if(pathArr.length < 2) return 0;
+            let d = 0;
+            for(let i=0;i<pathArr.length-1;i++) d += dist(pathArr[i], pathArr[i+1]);
+            d += dist(pathArr[pathArr.length-1], pathArr[0]);
+            return d;
+        }
+
+        function nearestNeighborPath() {
+            if(points.length < 2) return [...points];
+            let unvisited = points.map((_,i)=>i);
+            let pathIdx = [0];
+            unvisited.splice(unvisited.indexOf(0),1);
+            while(unvisited.length){
+                let last = pathIdx[pathIdx.length-1];
+                let nearest = unvisited.reduce((a,b)=> dist(points[last], points[a]) < dist(points[last], points[b]) ? a : b);
+                pathIdx.push(nearest);
+                unvisited.splice(unvisited.indexOf(nearest),1);
+            }
+            return pathIdx.map(i=>points[i]);
+        }
+
+        function twoOptImprove(pathArr) {
+            let best = [...pathArr];
+            let improved = true;
+            while(improved){
+                improved = false;
+                for(let i=0;i<best.length-2;i++){
+                    for(let j=i+1;j<best.length-1;j++){
+                        let newPath = best.slice(0,i+1);
+                        let rev = best.slice(i+1, j+1).reverse();
+                        newPath.push(...rev, ...best.slice(j+1));
+                        if(totalDistance(newPath) < totalDistance(best) - 0.0001){
+                            best = newPath;
+                            improved = true;
+                        }
+                    }
+                }
+            }
+            return best;
+        }
+
+        function geneticAlgorithmAdvanced() {
+            if(points.length < 2) return [...points];
+            let popSize = 70, generations = 150;
+            let population = [];
+            for(let i=0;i<popSize;i++){
+                let perm = [...Array(points.length).keys()];
+                for(let j=perm.length-1;j>0;j--){
+                    let r = Math.floor(Math.random()*(j+1));
+                    [perm[j], perm[r]] = [perm[r], perm[j]];
+                }
+                population.push(perm);
+            }
+            const fitness = (perm) => 1/(totalDistance(perm.map(i=>points[i]))+1e-8);
+            for(let gen=0;gen<generations;gen++){
+                let fits = population.map(fitness);
+                let totalFit = fits.reduce((a,b)=>a+b,0);
+                let newPop = [];
+                for(let i=0;i<popSize;i++){
+                    let p1 = tournamentSelection(population, fits);
+                    let p2 = tournamentSelection(population, fits);
+                    let child = orderCrossover(p1, p2);
+                    if(Math.random() < 0.08) child = mutateSwap(child);
+                    newPop.push(child);
+                }
+                let bestIdx = fits.reduce((imax, x, i, arr) => x > arr[imax] ? i : imax, 0);
+                newPop[0] = population[bestIdx];
+                population = newPop;
+            }
+            let finalFits = population.map(fitness);
+            let bestIndex = finalFits.reduce((imax, x, i, arr) => x > arr[imax] ? i : imax, 0);
+            return population[bestIndex].map(i=>points[i]);
+        }
+        function tournamentSelection(pop, fits, k=3){
+            let best = null, bestFit = -1;
+            for(let i=0;i<k;i++){
+                let idx = Math.floor(Math.random()*pop.length);
+                if(fits[idx] > bestFit){ bestFit = fits[idx]; best = pop[idx]; }
+            }
+            return best;
+        }
+        function orderCrossover(p1, p2){
+            let size = p1.length;
+            let start = Math.floor(Math.random()*size);
+            let end = Math.floor(Math.random()*size);
+            if(start > end) [start,end] = [end,start];
+            let child = new Array(size).fill(null);
+            for(let i=start;i<=end;i++) child[i] = p1[i];
+            let current = 0;
+            for(let i=0;i<size;i++){
+                let val = p2[(end+1+i)%size];
+                if(!child.includes(val)){
+                    while(child[current] !== null) current++;
+                    child[current] = val;
+                }
+            }
+            return child;
+        }
+        function mutateSwap(perm){
+            let i = Math.floor(Math.random()*perm.length);
+            let j = Math.floor(Math.random()*perm.length);
+            [perm[i], perm[j]] = [perm[j], perm[i]];
+            return perm;
+        }
+        function hybridPath() { return twoOptImprove(nearestNeighborPath()); }
+
+        // رندر نقاط با شماره‌گذاری خوانا و درشت
+        function renderPointsAndPath() {
+            while(pointGroup.children.length) pointGroup.remove(pointGroup.children[0]);
+            while(labelGroup.children.length) labelGroup.remove(labelGroup.children[0]);
+            while(lineGroup.children.length) lineGroup.remove(lineGroup.children[0]);
+
+            points.forEach((p, idx) => {
+                const sphereGeo = new THREE.SphereGeometry(0.34, 48, 48);
+                const material = new THREE.MeshStandardMaterial({ color: 0xffbc77, emissive: 0x552200, roughness: 0.3, metalness: 0.7 });
+                const sphere = new THREE.Mesh(sphereGeo, material);
+                sphere.position.set(p.x, 0.15, p.z);
+                sphere.castShadow = true;
+                pointGroup.add(sphere);
+                
+                const halo = new THREE.Mesh(new THREE.SphereGeometry(0.55, 24,24), new THREE.MeshBasicMaterial({ color: 0xffaa66, transparent: true, opacity: 0.2 }));
+                sphere.add(halo);
+                
+                // شماره نقطه با CSS2D - بزرگ و خوانا
+                const div = document.createElement('div');
+                div.textContent = `${idx+1}`;
+                div.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                div.style.color = '#FFE4A0';
+                div.style.fontSize = '20px';
+                div.style.fontWeight = 'bold';
+                div.style.padding = '4px 12px';
+                div.style.borderRadius = '50px';
+                div.style.border = '2px solid #facc55';
+                div.style.backdropFilter = 'blur(8px)';
+                div.style.fontFamily = 'monospace';
+                div.style.boxShadow = '0 0 12px rgba(0,0,0,0.5)';
+                div.style.textShadow = '1px 1px 0 #000';
+                const label = new CSS2DObject(div);
+                label.position.set(p.x, 0.75, p.z);
+                labelGroup.add(label);
+            });
+
+            if(currentPath3D.length >= 2){
+                const vertices = [];
+                for(let i=0;i<currentPath3D.length;i++) vertices.push(new THREE.Vector3(currentPath3D[i].x, 0.2, currentPath3D[i].z));
+                vertices.push(new THREE.Vector3(currentPath3D[0].x, 0.2, currentPath3D[0].z));
+                const lineGeo = new THREE.BufferGeometry().setFromPoints(vertices);
+                const lineMat = new THREE.LineBasicMaterial({ color: 0x6ca0ff });
+                const lineObj = new THREE.Line(lineGeo, lineMat);
+                lineGroup.add(lineObj);
+                
+                const midMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, emissive: 0x2266aa });
+                vertices.forEach(v => {
+                    const dot = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12,12), midMat);
+                    dot.position.copy(v);
+                    lineGroup.add(dot);
+                });
+            }
+        }
+
+        function updateComparison() {
+            if(points.length === 0){
+                document.getElementById('compareList').innerHTML = '<div style="opacity:0.6; text-align:center;">✨ نقاط را اضافه کنید</div>';
+                document.getElementById('bestDistanceVal').innerHTML = '0';
+                return;
+            }
+            let nn = nearestNeighborPath();
+            let two = twoOptImprove(nn);
+            let gen = geneticAlgorithmAdvanced();
+            let hybrid = hybridPath();
+            let results = [
+                { name: '🌱 نزدیکترین همسایه', dist: totalDistance(nn), path: nn },
+                { name: '⚙️ 2-OPT', dist: totalDistance(two), path: two },
+                { name: '🧬 ژنتیک', dist: totalDistance(gen), path: gen },
+                { name: '🔥 هیبرید', dist: totalDistance(hybrid), path: hybrid }
+            ];
+            results.sort((a,b)=> a.dist - b.dist);
+            let bestVal = results[0].dist;
+            document.getElementById('bestDistanceVal').innerHTML = bestVal.toFixed(2);
+            let html = '';
+            results.forEach(r => {
+                let percent = (bestVal / r.dist) * 100;
+                html += `<div class="algo-compare-item" onclick="window.showSpecificPath(${JSON.stringify(r.path)})">
+                            <strong>${r.name}</strong> <span style="float:left;">${r.dist.toFixed(2)}</span>
+                            <div style="background:#1e2a44; border-radius:12px; height:5px; margin-top:6px;"><div style="width:${percent}%; background:#facc55; height:5px; border-radius:12px;"></div></div>
+                         </div>`;
+            });
+            document.getElementById('compareList').innerHTML = html;
+            currentPath3D = results[0].path;
+            renderPointsAndPath();
+        }
+
+        window.showSpecificPath = function(pathArr){
+            currentPath3D = pathArr;
+            renderPointsAndPath();
+        };
+
+        function generateLearningSteps(algoType){
+            if(points.length < 2) return [];
+            let steps = [];
+            if(algoType === 'nearest'){
+                let unvisited = points.map((_,i)=>i);
+                let pathIdx = [0];
+                unvisited.splice(unvisited.indexOf(0),1);
+                steps.push({desc:`شروع از نقطه 1`, path:[points[0]]});
+                while(unvisited.length){
+                    let last = pathIdx[pathIdx.length-1];
+                    let nearest = unvisited.reduce((a,b)=> dist(points[last], points[a]) < dist(points[last], points[b]) ? a : b);
+                    let d = dist(points[last], points[nearest]);
+                    pathIdx.push(nearest);
+                    unvisited.splice(unvisited.indexOf(nearest),1);
+                    steps.push({desc:`➕ افزودن نقطه ${nearest+1} (فاصله ${d.toFixed(2)})`, path: pathIdx.map(i=>points[i])});
+                }
+                steps.push({desc:`🔁 مسیر نهایی با بازگشت`, path: pathIdx.map(i=>points[i])});
+            } else if(algoType === 'genetic'){
+                steps.push({desc:`🧬 تولید جمعیت اولیه و تکامل طی ۱۵۰ نسل`, path: geneticAlgorithmAdvanced()});
+            } else if(algoType === 'twoopt'){
+                let init = nearestNeighborPath();
+                steps.push({desc:`📌 مسیر اولیه NN: ${totalDistance(init).toFixed(2)}`, path: init});
+                let improved = twoOptImprove(init);
+                steps.push({desc:`🔄 بهبود با 2-OPT: ${totalDistance(improved).toFixed(2)}`, path: improved});
+            } else if(algoType === 'hybrid'){
+                let nn = nearestNeighborPath();
+                steps.push({desc:`مسیر NN: ${totalDistance(nn).toFixed(2)}`, path: nn});
+                steps.push({desc:`⚡ بهینه‌سازی نهایی هیبرید: ${totalDistance(hybridPath()).toFixed(2)}`, path: hybridPath()});
+            }
+            return steps;
+        }
+
+        async function startLearning(){
+            const algo = document.getElementById('algoSelectLearn').value;
+            const names = { nearest:'نزدیکترین همسایه', genetic:'ژنتیک', twoopt:'2-OPT', hybrid:'هیبرید' };
+            document.getElementById('currentAlgoName').innerHTML = names[algo];
+            learningSteps = generateLearningSteps(algo);
+            if(learningSteps.length === 0){
+                document.getElementById('stepExplanation').innerHTML = '⚠️ حداقل ۲ نقطه نیاز است';
+                return;
+            }
+            currentStep = 0;
+            isLearning = true;
+            document.getElementById('nextStepBtn').disabled = false;
+            showStep(0);
+            let dotsHtml = '';
+            learningSteps.forEach((_,idx)=> dotsHtml += `<div class="step-dot ${idx===0?'active':''}" onclick="window.goToStep(${idx})">${idx+1}</div>`);
+            document.getElementById('stepDots').innerHTML = dotsHtml;
+        }
+
+        function showStep(step){
+            if(!learningSteps[step]) return;
+            currentPath3D = learningSteps[step].path;
+            renderPointsAndPath();
+            document.getElementById('stepExplanation').innerHTML = `✨ ${learningSteps[step].desc}<br><span style="font-size:0.75rem; margin-top:6px; display:block;">طول مسیر: ${totalDistance(learningSteps[step].path).toFixed(2)}</span>`;
+            document.querySelectorAll('.step-dot').forEach((el,i)=>{
+                if(i===step) el.classList.add('active');
+                else el.classList.remove('active');
+            });
+        }
+
+        window.goToStep = function(step){
+            if(learningSteps && learningSteps[step]) { showStep(step); currentStep = step; }
+        };
+
+        document.getElementById('nextStepBtn').onclick = () => {
+            if(!isLearning) return;
+            if(currentStep+1 < learningSteps.length){
+                currentStep++;
+                showStep(currentStep);
+            } else {
+                document.getElementById('stepExplanation').innerHTML += `<br>✅ آموزش کامل شد! می‌توانید الگوریتم دیگری انتخاب کنید.`;
+                document.getElementById('nextStepBtn').disabled = true;
+                isLearning = false;
+            }
+        };
+
+        // رویدادهای تعاملی
+        renderer.domElement.addEventListener('click', (event) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            const mouseX = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            const mouseY = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(mouseX, mouseY), camera);
+            const intersects = raycaster.intersectObjects(pointGroup.children, true);
+            if(intersects.length === 0){
+                const plane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+                const inter = raycaster.ray.intersectPlane(plane, new THREE.Vector3());
+                if(inter){
+                    let newX = Math.min(7.8, Math.max(-7.8, inter.x));
+                    let newZ = Math.min(6.5, Math.max(-6.5, inter.z));
+                    points.push({ x: newX, z: newZ });
+                    updatePointCount();
+                    updateComparison();
+                    renderPointsAndPath();
+                }
+            }
+        });
+
+        renderer.domElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if(points.length > 0) { points.pop(); updatePointCount(); updateComparison(); renderPointsAndPath(); }
+        });
+
+        function updatePointCount(){ document.getElementById('pointCount').innerText = points.length; }
+        document.getElementById('addPointBtn').onclick = () => alert('🌟 روی صحنه سه بعدی کلیک کنید تا نقطه اضافه شود (شماره گذاری خودکار)');
+        document.getElementById('randomPointsBtn').onclick = () => {
+            points = [];
+            for(let i=0;i<10;i++) points.push({ x: (Math.random()-0.5)*14, z: (Math.random()-0.5)*10 });
+            updatePointCount(); updateComparison(); renderPointsAndPath();
+        };
+        document.getElementById('clearAllBtn').onclick = () => { points = []; currentPath3D = []; updatePointCount(); updateComparison(); renderPointsAndPath(); if(learningSteps) document.getElementById('nextStepBtn').disabled = true; isLearning=false; };
+        document.getElementById('runLearningBtn').onclick = startLearning;
+
+        function animate(){
+            requestAnimationFrame(animate);
+            controls.update();
+            starsField.rotation.y += 0.0003;
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', ()=>{
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        updatePointCount();
+        setTimeout(() => {
+            if(points.length === 0){
+                for(let i=0;i<6;i++) points.push({ x: (Math.random()-0.5)*11, z: (Math.random()-0.5)*8 });
+                updatePointCount(); updateComparison(); renderPointsAndPath();
+            }
+        }, 400);
+    </script>
+</body>
+</html>

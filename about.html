@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>درباره مسائل اقلیدسی | TSP و هندسه فضایی</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Vazir', 'Segoe UI', 'Poppins', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0a0f21 0%, #0d1428 50%, #0a0f21 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.05);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .about-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 30px 25px 100px;
+        }
+        
+        .about-hero {
+            background: linear-gradient(135deg, rgba(250, 204, 85, 0.12), rgba(59, 130, 246, 0.08));
+            border-radius: 40px;
+            padding: 50px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            border: 1px solid rgba(250, 204, 85, 0.25);
+            backdrop-filter: blur(10px);
+        }
+        
+        .about-hero h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #FFE2A4, #FFB347, #facc55);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .about-hero p {
+            font-size: 1rem;
+            color: #c5d0e6;
+            max-width: 750px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .about-card {
+            background: rgba(18, 28, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid rgba(250, 204, 85, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .about-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(250, 204, 85, 0.5);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            background: rgba(25, 38, 60, 0.8);
+        }
+        
+        .about-card h3 {
+            font-size: 1.3rem;
+            color: #facc55;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .about-card p {
+            color: #c5d0e6;
+            line-height: 1.7;
+            font-size: 0.9rem;
+        }
+        
+        .formula-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 18px;
+            padding: 18px;
+            text-align: center;
+            margin: 18px 0;
+            font-family: monospace;
+            font-size: 1.1rem;
+            color: #facc55;
+            border-right: 3px solid #facc55;
+            direction: ltr;
+        }
+        
+        .algorithm-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .algorithm-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #c5d0e6;
+            font-size: 0.9rem;
+        }
+        
+        .algorithm-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .badge {
+            background: rgba(250, 204, 85, 0.18);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #facc55;
+            display: inline-block;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 12px 18px;
+            border-radius: 18px;
+            margin: 12px 0;
+            color: #c5d0e6;
+        }
+        
+        @media (max-width: 768px) {
+            .about-container {
+                padding: 20px 15px 90px;
+            }
+            .about-hero {
+                padding: 30px 20px;
+            }
+            .about-hero h1 {
+                font-size: 1.6rem;
+            }
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+            .about-card {
+                padding: 20px;
+            }
+            .back-button {
+                bottom: 15px;
+                left: 15px;
+                padding: 10px 20px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="about-container">
+        <div class="about-hero">
+            <h1>📐 هندسه اقلیدسی و مسئله فروشنده دوره‌گرد</h1>
+            <p>کاوشی در مفاهیم بنیادین فضاهای اقلیدسی، الگوریتم‌های بهینه‌سازی و کاربردهای عملی TSP در دنیای واقعی</p>
+        </div>
+
+        <div class="about-grid">
+            <div class="about-card">
+                <h3>📏 فضای اقلیدسی چیست؟</h3>
+                <p>فضای اقلیدسی یک فضای هندسی است که در آن قضایای هندسه کلاسیک اقلیدس برقرار است. مهم‌ترین ویژگی این فضا، مفهوم <strong>فاصله اقلیدسی</strong> است:</p>
+                <div class="formula-box">
+                    d(p,q) = √[(x₁-x₂)² + (z₁-z₂)²]
+                </div>
+                <p>این فاصله، کوتاه‌ترین مسیر مستقیم بین دو نقطه در فضای دکارتی است و پایه‌گذار بسیاری از الگوریتم‌های بهینه‌سازی مکانی می‌باشد.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>🧩 مسئله TSP</h3>
+                <p><strong>Traveling Salesman Problem (TSP)</strong> یکی از مشهورترین مسائل بهینه‌سازی ترکیبیاتی است. فروشنده باید از تمام شهرها عبور کند، هر شهر را دقیقاً یک بار ملاقات نموده و به مبدأ بازگردد، با کمترین مسافت.</p>
+                <div class="formula-box">
+                    min Σ d(cᵢ, cᵢ₊₁) + d(cₙ, c₁)
+                </div>
+                <p>TSP یک مسئله <strong>NP-Hard</strong> است، با افزایش تعداد شهرها، زمان حل آن نمایی افزایش می‌یابد.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>⚡ کاربردهای TSP</h3>
+                <ul class="algorithm-list">
+                    <li>🚚 <strong>لجستیک:</strong> بهینه‌سازی مسیر خودروها</li>
+                    <li>🔬 <strong>بیوانفورماتیک:</strong> توالی‌یابی DNA</li>
+                    <li>🏭 <strong>صنعت:</strong> حرکت بازوهای رباتیک</li>
+                    <li>📡 <strong>مخابرات:</strong> طراحی شبکه</li>
+                    <li>🌌 <strong>نجوم:</strong> مسیر تلسکوپ‌های فضایی</li>
+                </ul>
+            </div>
+
+            <div class="about-card">
+                <h3>🔍 الگوریتم نزدیک‌ترین همسایه</h3>
+                <p>ساده‌ترین روش حل TSP. از یک نقطه شروع، در هر گام به نزدیک‌ترین نقطه بازدید نشده می‌رود.</p>
+                <div class="stats-row">
+                    <span>⏱ زمان اجرا:</span>
+                    <span class="badge">O(n²)</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <span class="badge">✅ سرعت بالا</span>
+                    <span class="badge" style="margin-right: 8px;">⚠️ غیر بهینه</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <h3>🧬 الگوریتم ژنتیک</h3>
+                <p>روش ابتکاری الهام گرفته از تکامل زیستی: تولید جمعیت، انتخاب، ترکیب، جهش و تکامل نسل‌ها.</p>
+                <div class="stats-row">
+                    <span>👥 جمعیت اولیه:</span>
+                    <span class="badge">۷۰ کروموزوم</span>
+                </div>
+                <div class="stats-row">
+                    <span>🔄 نسل‌ها:</span>
+                    <span class="badge">۱۵۰ نسل</span>
+                </div>
+            </div>
+
+            <div class="about-card">
+                <h3>🔄 الگوریتم 2-OPT</h3>
+                <p>الگوریتم بهبود محلی که با معکوس کردن بخش‌هایی از مسیر، طول کل را کاهش می‌دهد.</p>
+                <div class="formula-box" style="font-size: 0.85rem;">
+                    Reverse(s, t) → if improved then accept
+                </div>
+                <p>معمولاً به عنوان مرحله نهایی بهبود مسیرها استفاده می‌شود.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>🏆 چالش‌های حل TSP</h3>
+                <div class="stats-row">
+                    <span>n=10</span>
+                    <span>~181,440 مسیر</span>
+                </div>
+                <div class="stats-row">
+                    <span>n=15</span>
+                    <span>~87 میلیارد مسیر</span>
+                </div>
+                <div class="stats-row">
+                    <span>n=20</span>
+                    <span>~6.08×10¹⁶ مسیر</span>
+                </div>
+                <p style="margin-top: 12px; font-size: 0.85rem;">برای ابعاد بزرگ، از الگوریتم‌های تقریبی استفاده می‌شود.</p>
+            </div>
+
+            <div class="about-card">
+                <h3>📚 منابع مطالعه</h3>
+                <ul class="algorithm-list">
+                    <li>📖 "The Traveling Salesman Problem" - Applegate</li>
+                    <li>📖 "Introduction to Algorithms" - CLRS</li>
+                    <li>🌐 TSPLIB - مجموعه داده استاندارد</li>
+                    <li>🌐 Euclidean Geometry - Wikipedia</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-button" onclick="location.href='index.html'">
+        <span>←</span> بازگشت به صفحه اصلی
+    </button>
+</body>
+</html>
